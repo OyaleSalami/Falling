@@ -2,28 +2,50 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    Rigidbody2D rb;
+    [SerializeField]
+    private GameObject[] bodies;
+
+    private Rigidbody2D rb;
+    private AudioSource sd;
 
     private void Start()
     {
         rb = gameObject.GetComponent<Rigidbody2D>();
+        sd = gameObject.GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetMouseButtonDown(0) == true)
+        if(Input.anyKeyDown == true)
         {
             rb.gravityScale = rb.gravityScale * -1;
+            sd.Play();
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.tag == "obstacle")
+        if (collision.gameObject.tag == "obstacle")
         {
-            Debug.Log("Hit An Obstacle");
-            //Game Over
+            if (LevelManager.endlessMode == true)
+            {
+                //Change Shape
+                if (bodies[0].activeSelf == true)
+                {
+                    bodies[0].SetActive(false);
+                    bodies[1].SetActive(true);
+                }
+                else
+                {
+                    bodies[0].SetActive(true);
+                    bodies[1].SetActive(false);
+                }
+            }
+            else
+            {
+                //Game Over
+            }
         }
     }
 }
