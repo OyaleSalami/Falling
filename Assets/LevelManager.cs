@@ -2,11 +2,23 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+public enum GameMode
+{
+    unset,
+    play,
+    pause,
+    end,
+}
+
 public class LevelManager : MonoBehaviour
 {
     public static int score = 0;
-    public static bool endlessMode = true;
+    public static bool endlessMode = false;
     public static float obstacleSpeed = 15.0f;
+
+    [SerializeField]
+    private GameObject endMenu;
+    public static GameMode gameMode = GameMode.unset;
 
     [Header("Spawning Obstacles")]
     [SerializeField]
@@ -34,30 +46,39 @@ public class LevelManager : MonoBehaviour
         {
             PlayerPrefs.SetInt("hi_score", 0);
         }
+        gameMode = GameMode.unset;
     }
 
     public float timeSplice = 5.0f;
     public float currentTime = 0f;
     void Update()
     {
-        UpdateText();
-        //TODO: Code for spawning
-        if (currentTime >= timeSplice)
+        if (gameMode == GameMode.play)
         {
-            SpawnObstacle();
-            currentTime = 0f;
-        }
-        else
-        {
-            currentTime += Time.deltaTime;
+            UpdateText();
+            //TODO: Code for spawning
+            if (currentTime >= timeSplice)
+            {
+                SpawnObstacle();
+                currentTime = 0f;
+            }
+            else
+            {
+                currentTime += Time.deltaTime;
+            }
+
+            //Make game harder
+            timeSplice -= 0.0001f;
+            if (timeSplice < 0.7f) { timeSplice = 0.7f; }
+
+            obstacleSpeed += 0.0002f;
+            if (obstacleSpeed > 75f) { obstacleSpeed = 75f; }
         }
 
-        //Make game harder
-        timeSplice -= 0.0001f;
-        if (timeSplice < 0.5f) { timeSplice = 0.5f; }
-
-        obstacleSpeed += 0.0002f;
-        if (obstacleSpeed > 40f) { obstacleSpeed = 40f; }
+        if (gameMode == GameMode.end)
+        {
+            EndGame();
+        }
     }
 
     #region Display Update
@@ -77,8 +98,25 @@ public class LevelManager : MonoBehaviour
     #endregion Code to manipulate the UI display 
 
     #region Game Control
+    public void PlayGame()
+    {
+        gameMode = GameMode.play;
+    }
+
+    public void ToggleGameMode()
+    {
+        endlessMode = !endlessMode;
+    }
+
+    public void PauseGame()
+    {
+        gameMode = GameMode.pause;
+    }
+
     public void EndGame()
     {
+        gameMode = GameMode.unset;
+        endMenu.SetActive(true);
         if (score >= PlayerPrefs.GetInt("hi_score"))
         {
             PlayerPrefs.SetInt("hi_score", score);
@@ -105,8 +143,14 @@ public class LevelManager : MonoBehaviour
             repeat += 1;
             if (repeat > 2)
             {
-                if(location == 1) { location = 2; }
-                else { location = 1; }
+                if(location == 1) 
+                { 
+                    location = 0; 
+                }
+                else if (location == 0)
+                { 
+                    location = 1; 
+                }
                 repeat = 0;
             }
         }

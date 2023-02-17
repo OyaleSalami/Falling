@@ -4,6 +4,9 @@ public class Obstacle : MonoBehaviour
 {
     void Update()
     {
-        transform.Translate(new Vector2(-5, 0) * LevelManager.obstacleSpeed * Time.deltaTime);
+        if (LevelManager.gameMode == GameMode.play)
+        {
+            transform.Translate(new Vector2(-5, 0) * LevelManager.obstacleSpeed * Time.deltaTime);
+        }
     }
 }

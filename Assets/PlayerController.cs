@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.anyKeyDown == true)
+        if(Input.anyKeyDown == true & LevelManager.gameMode == GameMode.play)
         {
             rb.gravityScale = rb.gravityScale * -1;
             sd.Play();
@@ -45,6 +45,7 @@ public class PlayerController : MonoBehaviour
             else
             {
                 //Game Over
+                LevelManager.gameMode = GameMode.end;
             }
         }
     }
